@@ -18,7 +18,7 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <div class="max-w-md mx-auto space-y-6">
+    <div class="max-w-md mx-auto space-y-6 pb-10">
         <header class="text-center py-8">
             <h1 class="text-4xl font-black text-pink-600 tracking-tighter italic">HILA KLEIN</h1>
             <p class="text-gray-500 font-bold text-xs uppercase tracking-[0.2em] mt-2">Nails & Beauty Studio</p>
@@ -49,12 +49,12 @@
             </div>
         </div>
 
-        <div id="step3" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive">
+        <div id="step3" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all duration-500">
             <h2 class="text-xl font-extrabold text-gray-800 mb-6">מתי נוח לך?</h2>
-            <input type="date" id="bookingDate" onchange="loadTimes()" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold mb-6">
+            <input type="date" id="bookingDate" onchange="loadTimes()" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold mb-6 outline-none">
             <div id="timeGrid" class="grid grid-cols-3 gap-2">
                 </div>
-            <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl">קבעי תור עכשיו</button>
+            <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl animate-bounce">קבעי תור עכשיו</button>
         </div>
     </div>
 
@@ -72,10 +72,11 @@
 
         function nextStep(step) {
             if(step === 2) {
-                currentBooking.name = document.getElementById('userName').value;
-                currentBooking.phone = document.getElementById('userPhone').value;
-                if(!currentBooking.name || !currentBooking.phone) return alert("בבקשה מלאי פרטים");
+                currentBooking.name = document.getElementById('userName').value.trim();
+                currentBooking.phone = document.getElementById('userPhone').value.trim();
+                if(!currentBooking.name || !currentBooking.phone) return alert("בבקשה מלאי שם וטלפון");
                 document.getElementById('step2').classList.remove('step-inactive');
+                document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -84,6 +85,7 @@
             document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
             document.getElementById('step3').classList.remove('step-inactive');
+            document.getElementById('step3').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function loadTimes() {
@@ -92,7 +94,10 @@
             const grid = document.getElementById('timeGrid');
             grid.innerHTML = '<p class="col-span-3 text-center text-pink-400 animate-pulse font-bold">בודקת פנוי...</p>';
 
+            // חלונות זמן של שעה וחצי
             const slots = ["08:30", "10:00", "11:30", "13:00", "14:30", "16:00", "17:30"];
+            
+            // שימי לב: השם של ה-collection חייב להיות nail_bookings
             const snap = await db.collection("nail_bookings").where("date", "==", date).get();
             const taken = snap.docs.map(d => d.data().time);
 
@@ -100,14 +105,14 @@
             slots.forEach(s => {
                 const isTaken = taken.includes(s);
                 const btn = document.createElement('button');
-                btn.className = `p-3 rounded-xl font-bold transition-all ${isTaken ? 'bg-gray-100 text-gray-300' : 'bg-white text-pink-600 shadow-sm border border-pink-100 hover:bg-pink-600 hover:text-white'}`;
+                btn.className = `p-3 rounded-xl font-bold transition-all ${isTaken ? 'bg-gray-100 text-gray-300 cursor-not-allowed' : 'bg-white text-pink-600 shadow-sm border border-pink-100 hover:bg-pink-600 hover:text-white'}`;
                 btn.innerText = s;
                 btn.disabled = isTaken;
                 btn.onclick = () => {
                     currentBooking.time = s;
                     document.getElementById('finalBtn').classList.remove('hidden');
-                    document.querySelectorAll('#timeGrid button').forEach(b => b.classList.remove('ring-4', 'ring-pink-300'));
-                    btn.classList.add('ring-4', 'ring-pink-300');
+                    document.querySelectorAll('#timeGrid button').forEach(b => b.classList.remove('ring-4', 'ring-pink-300', 'bg-pink-600', 'text-white'));
+                    btn.classList.add('ring-4', 'ring-pink-300', 'bg-pink-600', 'text-white');
                 };
                 grid.appendChild(btn);
             });
@@ -115,13 +120,17 @@
 
         async function saveBooking() {
             try {
+                // שמירה לאוסף nail_bookings
                 await db.collection("nail_bookings").add({
                     ...currentBooking,
-                    timestamp: new Date().toISOString()
+                    createdAt: new Date().toISOString()
                 });
-                alert("התור נקבע בהצלחה! מחכה לך :)");
+                alert("יופי " + currentBooking.name + "! התור שלך נקבע בהצלחה.");
                 location.reload();
-            } catch(e) { alert("שגיאה, נסי שוב"); }
+            } catch(e) { 
+                console.error(e);
+                alert("משהו השתבש, נסי שוב"); 
+            }
         }
     </script>
 </body>
