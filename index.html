@@ -7,8 +7,7 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Hila Nails">
+    <meta name="mobile-web-app-title" content="Hila Nails">
     
     <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=HK&background=ffffff&color=db2777&size=512&font-size=0.45&bold=true">
     <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=HK&background=ffffff&color=db2777&size=512&font-size=0.45&bold=true">
@@ -20,7 +19,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #fff5f7; min-height: 100vh; margin: 0; padding: 0; }
+        body { font-family: 'Assistant', sans-serif; background: #fff5f7; min-height: 100vh; margin: 0; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
         .service-btn.active { border-color: #db2777; background: #fdf2f8; transform: scale(1.02); }
         .step-inactive { opacity: 0.5; pointer-events: none; filter: blur(1px); }
@@ -29,10 +28,15 @@
 </head>
 <body class="p-4">
 
-    <div class="max-w-md mx-auto space-y-6 pb-24 text-right">
-        <header class="text-center py-6">
+    <div class="max-w-md mx-auto space-y-5 pb-24 text-right">
+        <header class="text-center py-4">
             <h1 class="text-4xl font-black text-pink-600 tracking-tighter italic">HILA KLEIN</h1>
-            <p class="text-gray-500 font-bold text-[10px] mt-2 italic">הנחתום 6, באר שבע</p>
+            <div class="mt-2 bg-white/50 py-2 px-4 rounded-full inline-block border border-pink-100">
+                <p class="text-gray-700 font-bold text-xs italic">
+                    <i class="fas fa-map-marker-alt text-pink-500 ml-1"></i>
+                    הנחתום 6, באר שבע | קומה 1, קליניקת ד"ר לויטס
+                </p>
+            </div>
         </header>
 
         <button id="installBtn" class="w-full bg-gray-900 text-white p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl hidden">
@@ -45,7 +49,7 @@
             <div class="space-y-4">
                 <input type="text" id="userName" placeholder="שם מלא" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none">
                 <input type="tel" id="userPhone" placeholder="מספר טלפון" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none ltr">
-                <button onclick="nextStep(2)" class="w-full bg-pink-600 text-white p-4 rounded-2xl font-black shadow-lg">המשך לבחירת טיפול</button>
+                <button onclick="nextStep(2)" class="w-full bg-pink-600 text-white p-4 rounded-2xl font-black shadow-lg">המשך</button>
             </div>
         </div>
 
@@ -64,20 +68,37 @@
         </div>
 
         <div id="step3" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all">
-            <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic text-right">מתי נוח לך?</h2>
+            <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic">מתי נוח לך?</h2>
             <input type="date" id="bookingDate" onchange="loadTimes()" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold mb-6 outline-none text-pink-600">
             <div id="timeGrid" class="grid grid-cols-3 gap-2"></div>
             <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl">שלחי בקשה לתור</button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-4">
+            <a href="https://wa.me/972526526722" target="_blank" class="bg-white p-5 rounded-3xl shadow-md text-center border border-pink-50">
+                <i class="fab fa-whatsapp text-green-500 text-2xl"></i>
+                <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">צ'אט</p>
+            </a>
+            <a href="https://waze.com/ul?q=הנחתום 6 באר שבע" target="_blank" class="bg-white p-5 rounded-3xl shadow-md text-center border border-pink-50">
+                <i class="fab fa-waze text-blue-400 text-2xl"></i>
+                <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">Waze</p>
+            </a>
+            <a href="http://maps.apple.com/?q=הנחתום 6 באר שבע" target="_blank" class="bg-white p-5 rounded-3xl shadow-md text-center border border-pink-50">
+                <i class="fas fa-map-marked-alt text-red-400 text-2xl"></i>
+                <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">מפה</p>
+            </a>
         </div>
     </div>
 
     <div id="iphoneGuide" class="fixed inset-0 z-[200] install-overlay flex items-center justify-center p-8 text-center text-white">
         <div class="space-y-6">
-            <div class="w-20 h-20 bg-white text-pink-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black shadow-2xl">HK</div>
+            <div class="w-20 h-20 bg-white text-pink-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black shadow-2xl border-2 border-pink-200">HK</div>
             <h2 class="text-2xl font-black">הוסיפי למסך הבית</h2>
-            <p class="font-bold">1. לחצי על כפתור השיתוף בתחתית <i class="far fa-share-square"></i></p>
-            <p class="font-bold">2. בחרי ב-<span class="text-pink-400">"הוספה למסך הבית"</span></p>
-            <button onclick="document.getElementById('iphoneGuide').style.display='none'" class="bg-white text-black px-12 py-3 rounded-full font-black mt-4 uppercase">סגור</button>
+            <div class="text-right space-y-4 px-4">
+                <p class="font-bold">1. לחצי על כפתור השיתוף בתחתית <i class="far fa-share-square"></i></p>
+                <p class="font-bold">2. בחרי ב-<span class="text-pink-400">"הוספה למסך הבית"</span></p>
+            </div>
+            <button onclick="document.getElementById('iphoneGuide').style.display='none'" class="bg-white text-black px-12 py-3 rounded-full font-black mt-4">סגור</button>
         </div>
     </div>
 
@@ -112,8 +133,6 @@
             } else if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt = null;
-            } else {
-                alert("לחצי על 3 הנקודות למעלה ואז על 'הוספה למסך הבית'");
             }
         });
 
