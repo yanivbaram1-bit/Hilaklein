@@ -32,7 +32,7 @@
         <header class="text-center py-4">
             <h1 class="text-4xl font-black text-pink-600 tracking-tighter italic">HILA KLEIN</h1>
             <div class="mt-2 bg-white/50 py-2 px-4 rounded-full inline-block border border-pink-100">
-                <p class="text-gray-700 font-bold text-xs italic">
+                <p class="text-gray-700 font-bold text-[10px] sm:text-xs italic">
                     <i class="fas fa-map-marker-alt text-pink-500 ml-1"></i>
                     הנחתום 6, באר שבע | קומה 1, קליניקת ד"ר לויטס
                 </p>
@@ -57,12 +57,16 @@
             <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic">מה עושים היום?</h2>
             <div class="grid grid-cols-1 gap-3">
                 <button onclick="selectService('לק ג׳ל', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
-                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold italic">שעה וחצי</p></div>
+                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p></div>
                     <i class="fas fa-magic text-pink-200"></i>
                 </button>
-                <button onclick="selectService('מילוי / בנייה', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
-                    <div><p class="font-black text-gray-800 font-bold">מילוי או בנייה</p><p class="text-[10px] text-pink-400 font-bold italic">שעה וחצי</p></div>
+                <button onclick="selectService('בנייה בג׳ל', 120, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
+                    <div><p class="font-black text-gray-800">בנייה בג'ל</p><p class="text-[10px] text-pink-400 font-bold">שעתיים</p></div>
                     <i class="fas fa-gem text-pink-200"></i>
+                </button>
+                <button onclick="selectService('פדיקור', 60, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
+                    <div><p class="font-black text-gray-800">פדיקור</p><p class="text-[10px] text-pink-400 font-bold">שעה</p></div>
+                    <i class="fas fa-spa text-pink-200"></i>
                 </button>
             </div>
         </div>
