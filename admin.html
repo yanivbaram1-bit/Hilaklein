@@ -3,30 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hila Klein | Admin</title>
+    <title>Hila Admin</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3461/3461747.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #fdf2f8; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans">
+<body class="min-h-screen">
 
-    <div id="loginOverlay" class="fixed inset-0 bg-pink-600 z-[100] flex items-center justify-center p-6 hidden">
+    <div id="loginBox" class="fixed inset-0 bg-pink-600 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm text-center">
             <h1 class="text-2xl font-black mb-6">שלום הילה 👋</h1>
-            <input type="password" id="passInput" placeholder="סיסמה" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 text-center font-bold outline-none border-2 focus:border-pink-300 transition-all">
-            <button onclick="saveLogin()" class="w-full bg-black text-white p-4 rounded-2xl font-bold">כניסה למערכת</button>
+            <input type="password" id="passCode" placeholder="הקישי סיסמה" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 text-center font-bold outline-none">
+            <button onclick="checkAuth()" class="w-full bg-black text-white p-4 rounded-2xl font-bold uppercase tracking-widest">כניסה</button>
         </div>
     </div>
 
     <div id="dashboard" class="max-w-md mx-auto p-6 hidden">
-        <header class="flex justify-between items-center mb-8 pb-4 border-b">
-            <h1 class="text-2xl font-black text-gray-800 italic">HILA KLEIN</h1>
-            <button onclick="logout()" class="text-gray-400 text-xs font-bold">התנתקי</button>
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black italic">HILA ADMIN</h1>
+            <button onclick="logout()" class="text-gray-400"><i class="fas fa-sign-out-alt"></i></button>
         </header>
 
         <div id="list" class="space-y-4">
-            <p class="text-center text-gray-400 animate-pulse">מחפש תורים חדשים...</p>
+            <p class="text-center text-gray-400 animate-pulse font-bold">טוען יומן...</p>
         </div>
     </div>
 
@@ -40,54 +49,47 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // זיכרון ל-24 שעות
-        function checkAuth() {
-            const auth = JSON.parse(localStorage.getItem('hila_auth'));
+        function init() {
+            const session = JSON.parse(localStorage.getItem('hila_session'));
             const now = new Date().getTime();
-            if (auth && (now - auth.time < 24 * 60 * 60 * 1000)) {
-                showApp();
-            } else {
-                document.getElementById('loginOverlay').classList.remove('hidden');
-            }
+            if (session && (now - session.time < 24 * 60 * 60 * 1000)) { loadApp(); } 
+            else { document.getElementById('loginBox').classList.remove('hidden'); }
         }
 
-        function saveLogin() {
-            if (document.getElementById('passInput').value === "1234") {
-                localStorage.setItem('hila_auth', JSON.stringify({time: new Date().getTime()}));
+        function checkAuth() {
+            if (document.getElementById('passCode').value === "1234") {
+                localStorage.setItem('hila_session', JSON.stringify({time: new Date().getTime()}));
                 location.reload();
             } else { alert("סיסמה שגויה"); }
         }
 
-        function logout() {
-            localStorage.removeItem('hila_auth');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('hila_session'); location.reload(); }
 
-        function showApp() {
+        function loadApp() {
             document.getElementById('dashboard').classList.remove('hidden');
-            // טעינה חכמה: אם אין אינדקס, הוא פשוט יביא את כולם בלי סדר וימיין בתוך המחשב
             db.collection("nail_bookings").onSnapshot(snap => {
                 const list = document.getElementById('list');
                 list.innerHTML = '';
-                
                 let docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                // מיון פנימי למקרה שאין אינדקס ב-Firebase
                 docs.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
 
                 if (docs.length === 0) {
-                    list.innerHTML = '<p class="text-center text-gray-400 py-10 border-2 border-dashed rounded-3xl">אין תורים עדיין</p>';
+                    list.innerHTML = '<p class="text-center text-gray-400 py-10 border-2 border-dashed rounded-3xl">אין תורים</p>';
                     return;
                 }
 
                 docs.forEach(doc => {
+                    const wa = `https://wa.me/972${doc.phone.substring(1)}`;
                     list.innerHTML += `
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-r-4 border-pink-500 flex justify-between items-center">
+                        <div class="bg-white p-5 rounded-3xl shadow-sm border-r-8 border-pink-500 flex justify-between items-center">
                             <div>
-                                <p class="text-pink-600 font-black text-lg">${doc.time}</p>
-                                <p class="text-[10px] text-gray-400 font-bold">${doc.date}</p>
-                                <h3 class="font-bold text-gray-800 mt-1">${doc.name}</h3>
-                                <p class="text-xs text-gray-400">${doc.service}</p>
-                                <a href="tel:${doc.phone}" class="text-blue-500 text-xs font-bold underline">${doc.phone}</a>
+                                <p class="text-pink-600 font-black text-lg">${doc.time} <span class="text-[10px] text-gray-400">${doc.date}</span></p>
+                                <h3 class="font-bold text-gray-800">${doc.name}</h3>
+                                <p class="text-xs text-gray-400 mb-2">${doc.service}</p>
+                                <div class="flex gap-4">
+                                    <a href="tel:${doc.phone}" class="text-blue-400"><i class="fas fa-phone-alt"></i></a>
+                                    <a href="${wa}" target="_blank" class="text-green-500"><i class="fab fa-whatsapp"></i></a>
+                                </div>
                             </div>
                             <button onclick="deleteDoc('${doc.id}')" class="text-gray-200 hover:text-red-500"><i class="fas fa-trash"></i></button>
                         </div>
@@ -97,10 +99,10 @@
         }
 
         async function deleteDoc(id) {
-            if(confirm("למחוק את התור?")) await db.collection("nail_bookings").doc(id).delete();
+            if(confirm("למחוק?")) await db.collection("nail_bookings").doc(id).delete();
         }
 
-        window.onload = checkAuth;
+        window.onload = init;
     </script>
 </body>
 </html>
