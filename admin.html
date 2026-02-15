@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול תורים - הילה קליין</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-4">
+    <div class="max-w-md mx-auto">
+        <h1 class="text-2xl font-black text-pink-600 mb-6 italic">התורים שלי</h1>
+        <div id="admin-list" class="space-y-4"></div>
+    </div>
+
+    <script>
+        [span_2](start_span)// שימוש באותו קונפיגורציה של Firebase מהמוסך[span_2](end_span)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD7YAdTePRWYjwBbmy3gLRYd_OLDwpTL8",
+            authDomain: "baram-vag-45e12.firebaseapp.com",
+            projectId: "baram-vag-45e12",
+            appId: "1:761383355945:web:552554b5a6b9fe5e78be38"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        db.collection("nail_appts").orderBy("date").orderBy("time").onSnapshot(snap => {
+            const list = document.getElementById('admin-list');
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                list.innerHTML += `
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border-r-8 border-pink-500 flex justify-between items-center">
+                        <div>
+                            <p class="font-black text-gray-800">${data.name}</p>
+                            <p class="text-xs font-bold text-pink-400">${data.date} | ${data.time}</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">${data.service}</p>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <a href="tel:${data.phone}" class="text-green-500"><i class="fas fa-phone-alt"></i></a>
+                            <button onclick="deleteAppt('${doc.id}')" class="text-red-300"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        async function deleteAppt(id) {
+            if(confirm("למחוק את התור?")) await db.collection("nail_appts").doc(id).delete();
+        }
+    </script>
+</body>
+</html>
