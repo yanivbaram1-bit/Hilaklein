@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hila Klein - Nails</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;800&display=swap');
+        body { font-family: 'Assistant', sans-serif; background: #fff5f7; }
+        .selected { border: 3px solid #db2777 !important; background: #fdf2f8; }
+    </style>
+</head>
+<body class="pb-10">
+    <header class="bg-white p-8 shadow-sm text-center border-b-2 border-pink-100">
+        <h1 class="text-3xl font-black text-pink-600 italic">HILA KLEIN</h1>
+        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Nail Studio & Art</p>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 mt-6 space-y-8">
+        <section>
+            <h2 class="text-xl font-black mb-4 text-gray-800 italic">1. מה עושים היום?</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="selectService('לק ג׳ל', 90, this)" class="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-transparent transition-all text-center">
+                    <p class="font-black text-gray-700">לק ג'ל</p>
+                    <p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p>
+                </button>
+                <button onclick="selectService('מילוי / בנייה', 90, this)" class="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-transparent transition-all text-center">
+                    <p class="font-black text-gray-700 text-sm">מילוי/בנייה</p>
+                    <p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p>
+                </button>
+                <button onclick="selectService('תיקון', 30, this)" class="bg-white p-4 rounded-[1.5rem] shadow-sm border-2 border-transparent col-span-2">
+                    <p class="font-black text-gray-700">תיקון מהיר</p>
+                </button>
+            </div>
+        </section>
+
+        <section id="date-section" class="hidden">
+            <h2 class="text-xl font-black mb-4 text-gray-800 italic">2. מתי נוח לך?</h2>
+            <input type="date" id="date-picker" onchange="checkSlots()" class="w-full p-5 rounded-[2rem] border-none shadow-sm font-black text-pink-600 outline-none">
+        </section>
+
+        <section id="time-section" class="hidden">
+            <h2 class="text-xl font-black mb-4 text-gray-800 italic">3. שעות פנויות</h2>
+            <div id="slots-grid" class="grid grid-cols-3 gap-2"></div>
+        </section>
+
+        <section id="form-section" class="hidden bg-white p-8 rounded-[2.5rem] shadow-lg border border-pink-50">
+            <input type="text" id="cust-name" placeholder="שם מלא" class="w-full p-4 bg-gray-50 rounded-2xl mb-3 font-bold outline-none focus:ring-2 ring-pink-200">
+            <input type="tel" id="cust-phone" placeholder="מספר טלפון" class="w-full p-4 bg-gray-50 rounded-2xl mb-6 font-bold outline-none focus:ring-2 ring-pink-200 text-left">
+            <button onclick="confirmBooking()" class="w-full bg-pink-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl hover:bg-pink-700 transition">קבעי לי תור!</button>
+        </section>
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD7YAdTePRWYjwBbmy3gLRYd_OLDwpTL8",
+            authDomain: "baram-vag-45e12.firebaseapp.com",
+            [span_1](start_span)projectId: "baram-vag-45e12", // שימוש באותו פרויקט Firebase[span_1](end_span)
+            appId: "1:761383355945:web:552554b5a6b9fe5e78be38"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let booking = { service: '', date: '', time: '' };
+
+        function selectService(s, d, el) {
+            booking.service = s;
+            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('date-section').classList.remove('hidden');
+        }
+
+        async function checkSlots() {
+            const date = document.getElementById('date-picker').value;
+            booking.date = date;
+            const grid = document.getElementById('slots-grid');
+            grid.innerHTML = '<p class="col-span-3 text-center text-pink-300 animate-pulse font-bold">בודקת יומן...</p>';
+            
+            // שעות קבועות במרווחים של 90 דקות
+            const slots = ["08:30", "10:00", "11:30", "13:00", "14:30", "16:00", "17:30"];
+            const snap = await db.collection("nail_appts").where("date", "==", date).get();
+            const busy = snap.docs.map(d => d.data().time);
+
+            grid.innerHTML = '';
+            slots.forEach(s => {
+                const isBusy = busy.includes(s);
+                grid.innerHTML += `<button onclick="selectTime('${s}', this)" ${isBusy ? 'disabled' : ''} 
+                    class="p-4 rounded-2xl font-black border-2 transition-all ${isBusy ? 'bg-gray-100 text-gray-200 border-transparent' : 'bg-white border-pink-100 text-pink-600'}">${s}</button>`;
+            });
+            document.getElementById('time-section').classList.remove('hidden');
+        }
+
+        function selectTime(t, el) {
+            booking.time = t;
+            document.querySelectorAll('#slots-grid button').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('form-section').classList.remove('hidden');
+        }
+
+        async function confirmBooking() {
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            if(!name || !phone) return alert("בבקשה מלאי את כל הפרטים");
+
+            await db.collection("nail_appts").add({...booking, name, phone, createdAt: new Date().toISOString()});
+            alert("התור נקבע! מחכה לך :)");
+            location.reload();
+        }
+    </script>
+</body>
+</html>
