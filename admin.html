@@ -3,33 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Hila Klein</title>
+    <title>ניהול תורים | הילה קליין</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700;800&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen">
 
-    <div id="loginOverlay" class="fixed inset-0 bg-pink-600 z-[100] flex items-center justify-center p-6">
+    <div id="loginOverlay" class="fixed inset-0 bg-pink-600 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-sm text-center">
-            <h1 class="text-2xl font-black mb-6">כניסת מנהלת</h1>
-            <input type="password" id="passInput" placeholder="סיסמה" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 text-center font-bold outline-none">
-            <button onclick="checkPass()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold">כניסה למערכת</button>
+            <h1 class="text-2xl font-black mb-2 italic">HILA KLEIN</h1>
+            <p class="text-gray-400 text-sm mb-6 font-bold uppercase">כניסת מנהלת</p>
+            <input type="password" id="passInput" placeholder="סיסמה" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 text-center font-bold outline-none border-2 border-transparent focus:border-pink-300 transition-all">
+            <button onclick="saveLogin()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold hover:bg-black transition">כניסה למערכת</button>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto p-6 md:p-12">
-        <header class="flex justify-between items-center mb-10">
+    <div id="mainDashboard" class="max-w-4xl mx-auto p-6 md:p-12 opacity-0 transition-opacity duration-500">
+        <header class="flex justify-between items-end mb-10 border-b pb-6 border-pink-100">
             <div>
-                <h1 class="text-3xl font-black text-gray-900">לוח תורים</h1>
-                <p class="text-pink-500 font-bold">הילה קליין - Nails</p>
+                <h1 class="text-4xl font-black text-gray-900 tracking-tighter">לוח תורים</h1>
+                <p class="text-pink-500 font-bold uppercase text-xs tracking-widest mt-1">Hila Klein Studio</p>
             </div>
-            <button onclick="location.reload()" class="bg-white p-4 rounded-2xl shadow-sm"><i class="fas fa-sync-alt"></i></button>
+            <div class="text-left">
+                <button onclick="logout()" class="text-xs font-bold text-gray-400 hover:text-red-500">התנתק</button>
+            </div>
         </header>
 
-        <div id="adminContent" class="grid gap-4">
+        <div id="adminContent" class="grid gap-6">
+            <div class="text-center py-20">
+                <i class="fas fa-spinner fa-spin text-pink-300 text-3xl"></i>
+                <p class="text-gray-400 mt-4 font-bold">טוען תורים מהמערכת...</p>
             </div>
+        </div>
     </div>
 
     <script>
@@ -42,36 +53,73 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function checkPass() {
-            // תשנה את הסיסמה למה שאתה רוצה כאן (כרגע זה 1234)
-            if(document.getElementById('passInput').value === "1234") {
+        // בדיקה אם המשתמש מחובר (תקף ל-24 שעות)
+        function checkAuth() {
+            const loginData = JSON.parse(localStorage.getItem('hila_admin_login'));
+            const now = new Date().getTime();
+
+            if (loginData && (now - loginData.time < 24 * 60 * 60 * 1000)) {
+                showDashboard();
+            } else {
+                document.getElementById('loginOverlay').classList.remove('hidden');
+            }
+        }
+
+        function saveLogin() {
+            const pass = document.getElementById('passInput').value;
+            if (pass === "1234") { // הסיסמה שלך
+                const loginInfo = { loggedIn: true, time: new Date().getTime() };
+                localStorage.setItem('hila_admin_login', JSON.stringify(loginInfo));
                 document.getElementById('loginOverlay').classList.add('hidden');
-                loadBookings();
-            } else { alert("סיסמה שגויה"); }
+                showDashboard();
+            } else {
+                alert("סיסמה שגויה");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('hila_admin_login');
+            location.reload();
+        }
+
+        function showDashboard() {
+            document.getElementById('mainDashboard').style.opacity = "1";
+            loadBookings();
         }
 
         function loadBookings() {
+            // שים לב: "nail_bookings" חייב להיות זהה למה שכתוב בדף הלקוחות
             db.collection("nail_bookings").orderBy("date").orderBy("time").onSnapshot(snap => {
                 const container = document.getElementById('adminContent');
                 container.innerHTML = '';
                 
+                if (snap.empty) {
+                    container.innerHTML = '<div class="text-center p-20 bg-white rounded-[3rem] text-gray-400 font-bold border-2 border-dashed border-gray-100">אין תורים רשומים במערכת</div>';
+                    return;
+                }
+
                 snap.forEach(doc => {
                     const b = doc.data();
+                    const whatsappLink = `https://wa.me/972${b.phone.startsWith('0') ? b.phone.substring(1) : b.phone}`;
+                    
                     container.innerHTML += `
-                        <div class="bg-white p-6 rounded-[2rem] shadow-sm flex flex-wrap justify-between items-center border-r-8 border-pink-500">
+                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm flex flex-wrap justify-between items-center border-r-8 border-pink-500 hover:shadow-md transition-shadow">
                             <div class="flex gap-6 items-center">
-                                <div class="text-center bg-pink-50 p-4 rounded-2xl min-w-[100px]">
-                                    <p class="text-xl font-black text-pink-600">${b.time}</p>
-                                    <p class="text-[10px] font-bold text-gray-400">${b.date}</p>
+                                <div class="text-center bg-pink-50 p-4 rounded-3xl min-w-[110px]">
+                                    <p class="text-2xl font-black text-pink-600">${b.time}</p>
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">${b.date}</p>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg font-black text-gray-800">${b.name}</h3>
-                                    <p class="text-sm font-bold text-pink-400">${b.service}</p>
-                                    <a href="tel:${b.phone}" class="text-xs text-blue-500 underline font-bold">${b.phone}</a>
+                                    <h3 class="text-xl font-black text-gray-900 leading-tight">${b.name}</h3>
+                                    <p class="text-sm font-bold text-pink-400 italic">${b.service}</p>
+                                    <div class="flex gap-3 mt-2">
+                                        <a href="tel:${b.phone}" class="text-gray-400 hover:text-blue-500 transition-colors"><i class="fas fa-phone-alt"></i></a>
+                                        <a href="${whatsappLink}" target="_blank" class="text-gray-400 hover:text-green-500 transition-colors"><i class="fab fa-whatsapp"></i></a>
+                                    </div>
                                 </div>
                             </div>
-                            <button onclick="deleteAppt('${doc.id}')" class="p-4 text-red-200 hover:text-red-500 transition-all">
-                                <i class="fas fa-trash-alt"></i>
+                            <button onclick="deleteAppt('${doc.id}')" class="p-4 text-gray-200 hover:text-red-500 transition-all">
+                                <i class="fas fa-trash-alt text-lg"></i>
                             </button>
                         </div>
                     `;
@@ -80,8 +128,13 @@
         }
 
         async function deleteAppt(id) {
-            if(confirm("למחוק את התור מהיומן?")) await db.collection("nail_bookings").doc(id).delete();
+            if (confirm("למחוק את התור לצמיתות?")) {
+                await db.collection("nail_bookings").doc(id).delete();
+            }
         }
+
+        // הפעלת הבדיקה בטעינה
+        window.onload = checkAuth;
     </script>
 </body>
 </html>
