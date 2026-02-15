@@ -3,20 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול תורים - הילה קליין</title>
+    <title>Admin - Hila Klein</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen p-4">
-    <div class="max-w-md mx-auto">
-        <h1 class="text-2xl font-black text-pink-600 mb-6 italic">התורים שלי</h1>
-        <div id="admin-list" class="space-y-4"></div>
+<body class="bg-gray-50 min-h-screen">
+
+    <div id="loginOverlay" class="fixed inset-0 bg-pink-600 z-[100] flex items-center justify-center p-6">
+        <div class="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-sm text-center">
+            <h1 class="text-2xl font-black mb-6">כניסת מנהלת</h1>
+            <input type="password" id="passInput" placeholder="סיסמה" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 text-center font-bold outline-none">
+            <button onclick="checkPass()" class="w-full bg-gray-900 text-white p-4 rounded-2xl font-bold">כניסה למערכת</button>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto p-6 md:p-12">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-gray-900">לוח תורים</h1>
+                <p class="text-pink-500 font-bold">הילה קליין - Nails</p>
+            </div>
+            <button onclick="location.reload()" class="bg-white p-4 rounded-2xl shadow-sm"><i class="fas fa-sync-alt"></i></button>
+        </header>
+
+        <div id="adminContent" class="grid gap-4">
+            </div>
     </div>
 
     <script>
-        [span_2](start_span)// שימוש באותו קונפיגורציה של Firebase מהמוסך[span_2](end_span)
         const firebaseConfig = {
             apiKey: "AIzaSyDD7YAdTePRWYjwBbmy3gLRYd_OLDwpTL8",
             authDomain: "baram-vag-45e12.firebaseapp.com",
@@ -26,28 +42,45 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        db.collection("nail_appts").orderBy("date").orderBy("time").onSnapshot(snap => {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                const data = doc.data();
-                list.innerHTML += `
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border-r-8 border-pink-500 flex justify-between items-center">
-                        <div>
-                            <p class="font-black text-gray-800">${data.name}</p>
-                            <p class="text-xs font-bold text-pink-400">${data.date} | ${data.time}</p>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase">${data.service}</p>
+        function checkPass() {
+            // תשנה את הסיסמה למה שאתה רוצה כאן (כרגע זה 1234)
+            if(document.getElementById('passInput').value === "1234") {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                loadBookings();
+            } else { alert("סיסמה שגויה"); }
+        }
+
+        function loadBookings() {
+            db.collection("nail_bookings").orderBy("date").orderBy("time").onSnapshot(snap => {
+                const container = document.getElementById('adminContent');
+                container.innerHTML = '';
+                
+                snap.forEach(doc => {
+                    const b = doc.data();
+                    container.innerHTML += `
+                        <div class="bg-white p-6 rounded-[2rem] shadow-sm flex flex-wrap justify-between items-center border-r-8 border-pink-500">
+                            <div class="flex gap-6 items-center">
+                                <div class="text-center bg-pink-50 p-4 rounded-2xl min-w-[100px]">
+                                    <p class="text-xl font-black text-pink-600">${b.time}</p>
+                                    <p class="text-[10px] font-bold text-gray-400">${b.date}</p>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-black text-gray-800">${b.name}</h3>
+                                    <p class="text-sm font-bold text-pink-400">${b.service}</p>
+                                    <a href="tel:${b.phone}" class="text-xs text-blue-500 underline font-bold">${b.phone}</a>
+                                </div>
+                            </div>
+                            <button onclick="deleteAppt('${doc.id}')" class="p-4 text-red-200 hover:text-red-500 transition-all">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </div>
-                        <div class="flex flex-col gap-2">
-                            <a href="tel:${data.phone}" class="text-green-500"><i class="fas fa-phone-alt"></i></a>
-                            <button onclick="deleteAppt('${doc.id}')" class="text-red-300"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                    `;
+                });
             });
-        });
+        }
 
         async function deleteAppt(id) {
-            if(confirm("למחוק את התור?")) await db.collection("nail_appts").doc(id).delete();
+            if(confirm("למחוק את התור מהיומן?")) await db.collection("nail_bookings").doc(id).delete();
         }
     </script>
 </body>
