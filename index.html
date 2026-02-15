@@ -39,10 +39,10 @@
 
         <div id="step1" class="glass rounded-[2.5rem] p-8 shadow-xl">
             <h2 class="text-xl font-extrabold text-gray-800 mb-6 flex items-center gap-2 italic text-right">בואי נכיר</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 text-right">
                 <input type="text" id="userName" placeholder="שם מלא" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none transition-all">
                 <input type="tel" id="userPhone" placeholder="מספר טלפון" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none ltr text-right transition-all">
-                <button onclick="nextStep(2)" class="w-full bg-pink-600 text-white p-4 rounded-2xl font-black shadow-lg shadow-pink-100 uppercase">המשך</button>
+                <button onclick="nextStep(2)" class="w-full bg-pink-600 text-white p-4 rounded-2xl font-black shadow-lg shadow-pink-100">המשך</button>
             </div>
         </div>
 
@@ -50,15 +50,15 @@
             <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic text-right">מה עושים היום?</h2>
             <div class="grid grid-cols-1 gap-3 text-right">
                 <button onclick="selectService('לק ג׳ל', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
-                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold uppercase">שעה וחצי</p></div>
+                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p></div>
                     <i class="fas fa-magic text-pink-200"></i>
                 </button>
                 <button onclick="selectService('מילוי / בנייה', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
-                    <div><p class="font-black text-gray-800 font-bold">מילוי או בנייה</p><p class="text-[10px] text-pink-400 font-bold uppercase">שעה וחצי</p></div>
+                    <div><p class="font-black text-gray-800 font-bold">מילוי או בנייה</p><p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p></div>
                     <i class="fas fa-gem text-pink-200"></i>
                 </button>
                 <button onclick="selectService('תיקון ציפורן', 30, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
-                    <div><p class="font-black text-gray-800">תיקון ציפורן</p><p class="text-[10px] text-pink-400 font-bold italic uppercase text-right">בתיאום אישי</p></div>
+                    <div><p class="font-black text-gray-800">תיקון ציפורן</p><p class="text-[10px] text-pink-400 font-bold italic">בתיאום אישי</p></div>
                     <i class="fas fa-band-aid text-pink-200"></i>
                 </button>
             </div>
@@ -69,7 +69,7 @@
             <input type="date" id="bookingDate" onchange="loadTimes()" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold mb-6 outline-none text-pink-600">
             <div id="timeGrid" class="grid grid-cols-3 gap-2"></div>
             
-            <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl">שלחי בקשה לתור</button>
+            <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl animate-pulse">שלחי בקשה לתור</button>
             <p id="infoText" class="hidden text-[11px] text-center mt-4 text-gray-500 font-bold">* התור יישמר ביומן רק לאחר אישור סופי של הילה בוואטסאפ</p>
         </div>
 
@@ -123,10 +123,9 @@
             const date = document.getElementById('bookingDate').value;
             currentBooking.date = date;
             const grid = document.getElementById('timeGrid');
-            grid.innerHTML = '<p class="col-span-3 text-center text-pink-400 animate-pulse font-bold text-xs py-4">בודקת יומן...</p>';
+            grid.innerHTML = '<p class="col-span-3 text-center text-pink-400 animate-pulse font-bold text-xs py-4">בודקת...</p>';
 
             const slots = ["08:30", "10:00", "11:30", "13:00", "14:30", "16:00", "17:30"];
-            
             const snap = await db.collection("nail_bookings").where("date", "==", date).get();
             const taken = snap.docs.map(d => d.data().time);
 
@@ -156,13 +155,19 @@
                     createdAt: new Date().toISOString()
                 });
 
-                const message = `היי הילה, שלחתי בקשה לתור!%0A*שם:* ${currentBooking.name}%0A*טיפול:* ${currentBooking.service}%0A*תאריך:* ${currentBooking.date}%0A*שעה:* ${currentBooking.time}`;
-                alert("יופי " + currentBooking.name + "!\nבקשת התור נרשמה. עכשיו תועברי לוואטסאפ של הילה לשליחת ההודעה.");
-                
+                // הנוסח החדש שביקשת
+                const message = `היי הילה, זו ${currentBooking.name} שלחתי בקשה לתור!%0A%0A` +
+                                `*שם:* ${currentBooking.name}%0A` +
+                                `*טיפול:* ${currentBooking.service}%0A` +
+                                `*תאריך:* ${currentBooking.date}%0A` +
+                                `*שעה:* ${currentBooking.time}%0A%0A` +
+                                `אשמח לעדכון התור :)`;
+
+                alert("יופי " + currentBooking.name + "!\nעכשיו תועברי לוואטסאפ של הילה לאישור סופי.");
                 window.location.href = `https://wa.me/972526526722?text=${message}`;
 
             } catch(e) { 
-                alert("משהו השתבש בשמירה, נסי שוב"); 
+                alert("שגיאה בחיבור, נסי שוב"); 
             }
         }
     </script>
