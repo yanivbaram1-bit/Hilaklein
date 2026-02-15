@@ -57,7 +57,7 @@
         }
 
         function checkAuth() {
-            if (document.getElementById('passCode').value === "1234") {
+            if (document.getElementById('passCode').value === "6722") {
                 localStorage.setItem('hila_session', JSON.stringify({time: new Date().getTime()}));
                 location.reload();
             } else { alert("סיסמה שגויה"); }
