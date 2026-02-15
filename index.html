@@ -6,12 +6,12 @@
     <title>Hila Klein | Nails</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Hila Nails">
     
-    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/150/db2777/manicure.png">
-    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/150/db2777/manicure.png">
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=HK&background=ffffff&color=db2777&size=512&font-size=0.45&bold=true">
+    <link rel="icon" type="image/png" href="https://ui-avatars.com/api/?name=HK&background=ffffff&color=db2777&size=512&font-size=0.45&bold=true">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -20,90 +20,68 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: linear-gradient(135deg, #fff5f7 0%, #fce7f3 100%); min-height: 100vh; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
+        body { font-family: 'Assistant', sans-serif; background: #fff5f7; min-height: 100vh; margin: 0; padding: 0; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
         .service-btn.active { border-color: #db2777; background: #fdf2f8; transform: scale(1.02); }
         .step-inactive { opacity: 0.5; pointer-events: none; filter: blur(1px); }
-        .install-overlay { background: rgba(0,0,0,0.9); display: none; }
-        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .animate-pulse-soft { animation: pulse-soft 2s infinite; }
+        .install-overlay { background: rgba(0,0,0,0.9); display: none; position: fixed; inset: 0; z-index: 999; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
-    <div class="max-w-md mx-auto space-y-6 pb-24">
+    <div class="max-w-md mx-auto space-y-6 pb-24 text-right">
         <header class="text-center py-6">
             <h1 class="text-4xl font-black text-pink-600 tracking-tighter italic">HILA KLEIN</h1>
             <p class="text-gray-500 font-bold text-[10px] mt-2 italic">הנחתום 6, באר שבע</p>
         </header>
 
-        <button id="installBtn" class="w-full bg-gray-900 text-white p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl hidden border-2 border-pink-400 animate-pulse-soft">
+        <button id="installBtn" class="w-full bg-gray-900 text-white p-5 rounded-3xl font-black flex items-center justify-center gap-3 shadow-2xl hidden">
             <i class="fas fa-plus-circle text-pink-400"></i>
             התקיני את האפליקציה למסך הבית
         </button>
 
-        <div class="glass rounded-3xl p-4 text-center border-pink-200 shadow-sm">
-            <p class="text-xs font-bold text-gray-700">
-                <i class="fas fa-info-circle text-pink-400 ml-1"></i>
-                קומה 1, מתחם קליניקת ד״ר לויטס
-            </p>
-        </div>
-
         <div id="step1" class="glass rounded-[2.5rem] p-8 shadow-xl">
-            <h2 class="text-xl font-extrabold text-gray-800 mb-6 text-right italic">בואי נכיר</h2>
+            <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic">בואי נכיר</h2>
             <div class="space-y-4">
-                <input type="text" id="userName" placeholder="שם מלא" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none text-right">
-                <input type="tel" id="userPhone" placeholder="מספר טלפון" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none ltr text-right">
+                <input type="text" id="userName" placeholder="שם מלא" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none">
+                <input type="tel" id="userPhone" placeholder="מספר טלפון" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold focus:ring-2 ring-pink-300 outline-none ltr">
                 <button onclick="nextStep(2)" class="w-full bg-pink-600 text-white p-4 rounded-2xl font-black shadow-lg">המשך לבחירת טיפול</button>
             </div>
         </div>
 
-        <div id="step2" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all duration-500">
-            <h2 class="text-xl font-extrabold text-gray-800 mb-6 text-right italic text-right">מה עושים היום?</h2>
+        <div id="step2" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all">
+            <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic">מה עושים היום?</h2>
             <div class="grid grid-cols-1 gap-3">
-                <button onclick="selectService('לק ג׳ל', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all text-right">
-                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p></div>
+                <button onclick="selectService('לק ג׳ל', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
+                    <div><p class="font-black text-gray-800">לק ג'ל</p><p class="text-[10px] text-pink-400 font-bold italic">שעה וחצי</p></div>
                     <i class="fas fa-magic text-pink-200"></i>
                 </button>
-                <button onclick="selectService('מילוי / בנייה', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all text-right">
-                    <div><p class="font-black text-gray-800 font-bold">מילוי או בנייה</p><p class="text-[10px] text-pink-400 font-bold">שעה וחצי</p></div>
+                <button onclick="selectService('מילוי / בנייה', 90, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all">
+                    <div><p class="font-black text-gray-800 font-bold">מילוי או בנייה</p><p class="text-[10px] text-pink-400 font-bold italic">שעה וחצי</p></div>
                     <i class="fas fa-gem text-pink-200"></i>
-                </button>
-                <button onclick="selectService('תיקון ציפורן', 30, this)" class="service-btn w-full p-4 rounded-2xl border-2 border-transparent bg-white shadow-sm flex justify-between items-center transition-all text-right">
-                    <div><p class="font-black text-gray-800">תיקון ציפורן</p><p class="text-[10px] text-pink-400 font-bold italic">בתיאום אישי</p></div>
-                    <i class="fas fa-band-aid text-pink-200"></i>
                 </button>
             </div>
         </div>
 
-        <div id="step3" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all duration-500">
-            <h2 class="text-xl font-extrabold text-gray-800 mb-6 text-right italic">מתי נוח לך?</h2>
+        <div id="step3" class="glass rounded-[2.5rem] p-8 shadow-xl step-inactive transition-all">
+            <h2 class="text-xl font-extrabold text-gray-800 mb-6 italic text-right">מתי נוח לך?</h2>
             <input type="date" id="bookingDate" onchange="loadTimes()" class="w-full p-4 rounded-2xl border-none bg-pink-50/50 font-bold mb-6 outline-none text-pink-600">
             <div id="timeGrid" class="grid grid-cols-3 gap-2"></div>
             <button id="finalBtn" onclick="saveBooking()" class="hidden w-full mt-8 bg-gray-900 text-white p-5 rounded-2xl font-black shadow-2xl">שלחי בקשה לתור</button>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 mt-4">
-            <a href="https://wa.me/972526526722" target="_blank" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-all"><i class="fab fa-whatsapp text-green-400 text-2xl"></i></a>
-            <a href="https://waze.com/ul?q=הנחתום 6 באר שבע" target="_blank" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-all"><i class="fab fa-waze text-blue-400 text-2xl"></i></a>
-            <a href="http://maps.apple.com/?q=הנחתום 6 באר שבע" target="_blank" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-all"><i class="fas fa-map-marker-alt text-red-400 text-2xl"></i></a>
         </div>
     </div>
 
     <div id="iphoneGuide" class="fixed inset-0 z-[200] install-overlay flex items-center justify-center p-8 text-center text-white">
         <div class="space-y-6">
-            <img src="https://img.icons8.com/ios-filled/150/db2777/manicure.png" class="w-20 h-20 mx-auto rounded-2xl shadow-2xl bg-white p-2">
+            <div class="w-20 h-20 bg-white text-pink-600 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black shadow-2xl">HK</div>
             <h2 class="text-2xl font-black">הוסיפי למסך הבית</h2>
-            <div class="text-right space-y-4">
-                <p class="font-bold">1. לחצי על כפתור השיתוף בתחתית <i class="far fa-share-square text-blue-400"></i></p>
-                <p class="font-bold">2. גללי למטה ובחרי ב-<span class="text-pink-400">"הוספה למסך הבית"</span></p>
-            </div>
-            <button onclick="document.getElementById('iphoneGuide').style.display='none'" class="bg-white text-black px-12 py-3 rounded-full font-black mt-4">הבנתי, תודה</button>
+            <p class="font-bold">1. לחצי על כפתור השיתוף בתחתית <i class="far fa-share-square"></i></p>
+            <p class="font-bold">2. בחרי ב-<span class="text-pink-400">"הוספה למסך הבית"</span></p>
+            <button onclick="document.getElementById('iphoneGuide').style.display='none'" class="bg-white text-black px-12 py-3 rounded-full font-black mt-4 uppercase">סגור</button>
         </div>
     </div>
 
     <script>
-        // אתחול Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDD7YAdTePRWYjwBbmy3gLRYd_OLDwpTL8",
             authDomain: "baram-vag-45e12.firebaseapp.com",
@@ -113,7 +91,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ניהול התקנה
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
 
@@ -140,7 +117,6 @@
             }
         });
 
-        // לוגיקה של הזמנה
         let currentBooking = { name: '', phone: '', service: '', date: '', time: '' };
 
         function nextStep(step) {
@@ -165,7 +141,7 @@
             const date = document.getElementById('bookingDate').value;
             currentBooking.date = date;
             const grid = document.getElementById('timeGrid');
-            grid.innerHTML = '<p class="col-span-3 text-center text-pink-400 font-bold text-xs py-4 italic animate-pulse">בודקת יומן...</p>';
+            grid.innerHTML = '<p class="col-span-3 text-center text-pink-400 font-bold py-4 italic animate-pulse">בודקת יומן...</p>';
 
             const slots = ["08:30", "10:00", "11:30", "13:00", "14:30", "16:00", "17:30"];
             const snap = await db.collection("nail_bookings").where("date", "==", date).get();
@@ -195,18 +171,10 @@
                     status: 'pending',
                     createdAt: new Date().toISOString()
                 });
-
-                const message = `היי הילה, זו ${currentBooking.name} שלחתי בקשה לתור!%0A%0A` +
-                                `*שם:* ${currentBooking.name}%0A` +
-                                `*טיפול:* ${currentBooking.service}%0A` +
-                                `*תאריך:* ${currentBooking.date}%0A` +
-                                `*שעה:* ${currentBooking.time}%0A%0A` +
-                                `אשמח לעדכון התור :)`;
-
-                alert("יופי " + currentBooking.name + "!\nעכשיו תועברי לוואטסאפ של הילה לאישור סופי.");
+                const message = `היי הילה, זו ${currentBooking.name} שלחתי בקשה לתור!%0A%0A*שם:* ${currentBooking.name}%0A*טיפול:* ${currentBooking.service}%0A*תאריך:* ${currentBooking.date}%0A*שעה:* ${currentBooking.time}%0A%0Aאשמח לעדכון התור :)`;
+                alert("יופי " + currentBooking.name + "!\nעכשיו תועברי לוואטסאפ של הילה לאישור.");
                 window.location.href = `https://wa.me/972526526722?text=${message}`;
-
-            } catch(e) { alert("שגיאה בחיבור, נסי שוב"); }
+            } catch(e) { alert("שגיאה בחיבור"); }
         }
     </script>
 </body>
