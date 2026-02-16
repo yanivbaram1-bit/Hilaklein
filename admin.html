@@ -7,89 +7,123 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #f8fafc; }
-        .license-plate { background: #ffeb3b; border: 3px solid #000; border-radius: 12px; font-weight: 900; box-shadow: 0 4px 0 #000; }
+        body { font-family: 'Assistant', sans-serif; background: #f8fafc; margin: 0; }
+        .license-plate { 
+            background: #ffeb3b; 
+            border: 3px solid #000; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            box-shadow: 0 4px 0 #000;
+        }
     </style>
 </head>
-<body class="antialiased p-4">
+<body class="antialiased">
 
-    <div class="max-w-md mx-auto min-h-[90vh] bg-white shadow-2xl rounded-[3rem] overflow-hidden flex flex-col">
-        <div class="bg-blue-700 pt-10 pb-16 text-white text-center">
-            <h1 class="text-3xl font-black italic">AUTO-VIN PRO</h1>
-            <p class="text-blue-200 text-xs mt-1">עוקף חסימות ממשלתיות מבוסס Google Server</p>
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl flex flex-col overflow-hidden">
+        <div class="bg-gradient-to-br from-blue-700 to-indigo-900 pt-12 pb-20 px-6 rounded-b-[50px] shadow-xl text-center">
+            <h1 class="text-white text-3xl font-extrabold tracking-tight">מערכת מק"טים PRO</h1>
+            <p class="text-blue-200 text-sm mt-2 opacity-80">שליפת VIN ללא חסימות</p>
         </div>
 
-        <div class="px-6 -mt-10 flex-1">
-            <div class="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
-                <input type="tel" id="plateInput" placeholder="מספר רכב" 
-                       class="license-plate w-full py-4 text-center text-4xl tracking-[5px] outline-none mb-4">
-                <button onclick="fetchViaGoogle()" id="btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg active:scale-95 transition-all">
-                    שלוף נתונים
-                </button>
-            </div>
-
-            <div id="loader" class="hidden text-center py-10">
-                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mx-auto mb-2"></div>
-                <p class="text-blue-600 font-bold">גוגל מושכת נתונים מהמאגר...</p>
-            </div>
-
-            <div id="results" class="hidden mt-8 space-y-4">
-                <div class="bg-slate-900 p-6 rounded-[2rem] text-center border-b-4 border-blue-500">
-                    <span class="text-blue-400 text-[10px] font-black block mb-1 tracking-widest uppercase">Chassis Number (VIN)</span>
-                    <p id="resVin" class="text-white font-mono text-xl font-bold tracking-widest break-all mb-4"></p>
-                    <button onclick="copyVin()" class="w-full bg-white/10 text-white text-xs py-3 rounded-xl border border-white/10">העתק</button>
+        <div class="px-6 -mt-12">
+            <div class="bg-white rounded-3xl shadow-2xl p-6 border border-gray-50">
+                <div class="space-y-4">
+                    <div class="text-center">
+                        <label class="block text-gray-400 text-[10px] font-bold mb-1 uppercase">הכנס מספר רכב</label>
+                        <input type="tel" id="plateInput" placeholder="44648402" 
+                               class="license-plate w-full py-4 text-center text-4xl tracking-[4px] outline-none">
+                    </div>
+                    <button onclick="fetchVehicleData()" id="searchBtn"
+                            class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white py-5 rounded-2xl font-bold text-xl transition-all shadow-lg flex justify-center items-center">
+                        <span id="btnText">שלוף נתונים</span>
+                    </button>
                 </div>
-                
-                <div class="grid grid-cols-2 gap-2 text-center">
-                    <div class="bg-gray-50 p-3 rounded-2xl"><span class="text-[10px] text-gray-400 block">יצרן</span><p id="resMake" class="font-bold"></p></div>
-                    <div class="bg-gray-50 p-3 rounded-2xl"><span class="text-[10px] text-gray-400 block">דגם</span><p id="resModel" class="font-bold"></p></div>
-                </div>
-
-                <a id="pSouq" target="_blank" class="block bg-orange-500 text-white p-5 rounded-2xl text-center font-bold shadow-lg">פתח ב-Partsouq ➔</a>
             </div>
+        </div>
+
+        <div id="loader" class="hidden flex flex-col items-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-2"></div>
+            <p class="text-blue-600 font-bold">מתחבר למאגר...</p>
+        </div>
+
+        <div id="results" class="hidden px-6 py-8 space-y-6">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
+                    <span class="text-slate-400 text-[10px] font-bold block">יצרן</span>
+                    <p id="resMake" class="font-bold text-slate-800 text-lg"></p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
+                    <span class="text-slate-400 text-[10px] font-bold block">דגם</span>
+                    <p id="resModel" class="font-bold text-slate-800 text-lg"></p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-[30px] p-6 text-center shadow-xl border-t-4 border-blue-500">
+                <span class="text-blue-400 text-[10px] font-black uppercase block mb-2 tracking-widest">מספר שלדה (VIN)</span>
+                <p id="resVin" class="text-white font-mono text-xl font-bold tracking-[2px] mb-5"></p>
+                <button onclick="copyVin()" class="w-full bg-white/10 text-white text-xs py-3 rounded-xl font-bold border border-white/10">העתק מספר שלדה</button>
+            </div>
+
+            <div class="space-y-3">
+                <a id="linkPartsouq" target="_blank" class="flex items-center justify-between bg-orange-500 text-white p-5 rounded-2xl font-bold shadow-lg shadow-orange-100">
+                    <span>פתח בקטלוג Partsouq</span>
+                    <span class="text-2xl">➔</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto p-8 text-center text-slate-300 text-[10px] font-bold tracking-widest uppercase">
+            Official Data Source 2026
         </div>
     </div>
 
     <script>
-        async function fetchViaGoogle() {
+        async function fetchVehicleData() {
             const plate = document.getElementById('plateInput').value.trim();
-            // *** כאן תדביק את הכתובת שהעתקת מגוגל ***
-            const googleAppUrl = 'תדביק_כאן_את_הכתובת_שלך'; 
+            const btn = document.getElementById('searchBtn');
+            const results = document.getElementById('results');
+            const loader = document.getElementById('loader');
 
-            if (!plate || googleAppUrl.includes('תדביק')) {
-                alert("חובה להגדיר את הכתובת מגוגל בקוד!");
-                return;
-            }
+            if (!plate) return;
 
-            document.getElementById('btn').disabled = true;
-            document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('results').classList.add('hidden');
+            btn.disabled = true;
+            results.classList.add('hidden');
+            loader.classList.remove('hidden');
 
             try {
-                const response = await fetch(`${googleAppUrl}?plate=${plate}`);
-                const data = await response.json();
+                const resourceId = '053ad243-5e8b-4474-8c27-40e4ee9067b0';
+                const targetUrl = `https://data.gov.il/api/3/action/datastore_search?resource_id=${resourceId}&q=${plate}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+                const response = await fetch(proxyUrl);
+                const json = await response.json();
+                const data = JSON.parse(json.contents);
+                
                 const car = data.result.records.find(r => String(r.mispar_rechev).trim() === plate);
 
                 if (car) {
                     document.getElementById('resMake').innerText = car.tozeret_nm;
                     document.getElementById('resModel').innerText = car.kinuy_mishari;
                     document.getElementById('resVin').innerText = car.deg_deg;
-                    document.getElementById('pSouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${car.deg_deg}`;
-                    document.getElementById('results').classList.remove('hidden');
+                    document.getElementById('linkPartsouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${car.deg_deg}`;
+                    
+                    loader.classList.add('hidden');
+                    results.classList.remove('hidden');
                 } else {
-                    alert("רכב לא נמצא");
+                    alert("מספר רכב לא נמצא במאגר הממשלתי");
                 }
-            } catch (e) {
-                alert("שגיאת תקשורת עם השרת של גוגל");
+            } catch (err) {
+                alert("ישנה בעיית תקשורת. נסה שוב בעוד כמה דקות.");
             } finally {
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('btn').disabled = false;
+                btn.disabled = false;
+                loader.classList.add('hidden');
             }
         }
 
         function copyVin() {
-            navigator.clipboard.writeText(document.getElementById('resVin').innerText);
-            alert("הועתק!");
+            const vin = document.getElementById('resVin').innerText;
+            navigator.clipboard.writeText(vin);
+            alert("מספר השלדה הועתק!");
         }
     </script>
 </body>
