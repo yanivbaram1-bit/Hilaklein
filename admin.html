@@ -3,61 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>איתור מק"טים לפי מספר רכב</title>
+    <title>איתור מק"טים מקצועי</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f3f4f6; }
-        .car-card { transition: all 0.3s ease; }
-    </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="bg-gray-100 p-4 md:p-8">
 
-    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-2xl font-bold">מערכת איתור מק"טים מקצועית</h1>
-            <p class="opacity-80 mt-1">שליית מספר שלדה (VIN) בלחיצה אחת</p>
+    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-blue-600 p-8 text-white text-center">
+            <h1 class="text-3xl font-bold">מערכת איתור מק"טים</h1>
+            <p class="opacity-90 mt-2 font-light">שליפת מספר שלדה (VIN) בלחיצה אחת</p>
         </div>
 
         <div class="p-6">
-            <div class="mb-8">
-                <label class="block text-gray-700 font-semibold mb-2">הכנס מספר רכב:</label>
+            <div class="mb-6">
+                <label class="block text-gray-700 font-bold mb-2">הכנס מספר רכב:</label>
                 <div class="flex gap-2">
-                    <input type="number" id="plateInput" placeholder="למשל 12345678" 
-                           class="flex-1 border-2 border-blue-100 rounded-xl p-3 text-center text-xl font-bold focus:border-blue-500 outline-none">
+                    <input type="number" id="plateInput" placeholder="44648402" 
+                           class="flex-1 border-2 border-blue-100 rounded-2xl p-4 text-center text-2xl font-bold focus:border-blue-500 outline-none transition-all">
                     <button onclick="fetchCarDetails()" id="searchBtn"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl font-bold transition flex items-center gap-2">
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-2xl font-bold transition-transform active:scale-95">
                         חפש
                     </button>
                 </div>
-                <p id="errorMsg" class="text-red-500 mt-2 hidden text-sm font-bold"></p>
+                <p id="errorMsg" class="text-red-500 mt-3 hidden text-sm font-bold text-center"></p>
             </div>
 
-            <div id="results" class="hidden animate-in fade-in duration-500">
-                <div class="bg-gray-50 p-4 rounded-2xl border-r-4 border-blue-500 mb-6">
-                    <h3 class="font-bold text-lg mb-3">פרטי רכב:</h3>
+            <div id="results" class="hidden space-y-4">
+                <div class="bg-blue-50 p-5 rounded-2xl border-r-8 border-blue-600">
+                    <h3 class="font-bold text-blue-900 mb-3 border-b border-blue-200 pb-1">פרטי רכב מזוהים:</h3>
                     <div class="grid grid-cols-2 gap-y-3 text-sm">
-                        <div><span class="text-gray-500">יצרן:</span> <span id="resMake" class="font-bold"></span></div>
-                        <div><span class="text-gray-500">דגם:</span> <span id="resModel" class="font-bold"></span></div>
-                        <div><span class="text-gray-500">שנה:</span> <span id="resYear" class="font-bold"></span></div>
-                        <div><span class="text-gray-500">מנוע:</span> <span id="resEngine" class="font-bold uppercase font-mono text-blue-600"></span></div>
+                        <div><span class="text-gray-500">יצרן:</span> <p id="resMake" class="font-bold text-gray-800"></p></div>
+                        <div><span class="text-gray-500">דגם:</span> <p id="resModel" class="font-bold text-gray-800"></p></div>
+                        <div><span class="text-gray-500">שנה:</span> <p id="resYear" class="font-bold text-gray-800"></p></div>
+                        <div><span class="text-gray-500">מנוע:</span> <p id="resEngine" class="font-bold uppercase font-mono text-blue-700"></p></div>
                     </div>
                 </div>
 
-                <div class="bg-blue-900 text-white p-4 rounded-xl mb-6">
-                    <span class="text-xs opacity-70 block mb-1 uppercase">מספר שלדה (VIN):</span>
+                <div class="bg-gray-900 text-white p-5 rounded-2xl relative overflow-hidden">
+                    <span class="text-[10px] opacity-50 block mb-1 uppercase tracking-widest">מספר שלדה (VIN)</span>
                     <div class="flex justify-between items-center">
-                        <span id="resVin" class="text-lg font-mono font-bold tracking-widest"></span>
-                        <button onclick="copyVin()" class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded">העתק</button>
+                        <span id="resVin" class="text-xl font-mono font-bold tracking-[2px]"></span>
+                        <button onclick="copyVin()" class="bg-blue-600 text-xs px-3 py-1 rounded-lg hover:bg-blue-500">העתק</button>
                     </div>
                 </div>
 
-                <h3 class="font-bold mb-3 text-gray-700">פתח קטלוג חלפים ב:</h3>
-                <div class="grid grid-cols-1 gap-3">
-                    <a id="linkPartsouq" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-xl flex justify-between items-center font-bold">
-                        Partsouq (מומלץ ליפניות/קוריאניות) <span>➜</span>
+                <div class="grid grid-cols-1 gap-3 pt-2">
+                    <a id="linkPartsouq" target="_blank" class="bg-[#ff6b00] hover:bg-[#e66000] text-white p-4 rounded-2xl flex justify-between items-center font-bold shadow-lg transition-all">
+                        <span>פתח ב-Partsouq</span>
+                        <span class="text-xl">➔</span>
                     </a>
-                    <a id="link7Zap" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-xl flex justify-between items-center font-bold">
-                        7Zap (מומלץ לאירופאיות) <span>➜</span>
+                    <a id="link7Zap" target="_blank" class="bg-[#0055ff] hover:bg-[#004cd4] text-white p-4 rounded-2xl flex justify-between items-center font-bold shadow-lg transition-all">
+                        <span>פתח ב-7Zap</span>
+                        <span class="text-xl">➔</span>
                     </a>
                 </div>
             </div>
@@ -74,35 +71,43 @@
             if (!plate) return;
 
             btn.disabled = true;
-            btn.innerText = "מחפש...";
+            btn.innerHTML = `<span class="animate-pulse">...</span>`;
             error.classList.add('hidden');
             results.classList.add('hidden');
 
             try {
-                // פנייה למאגר הממשלתי
-                const response = await fetch(`https://data.gov.il/api/3/action/datastore_search?resource_id=053ad243-5e8b-4474-8c27-40e4ee9067b0&q=${plate}`);
-                const data = await response.json();
-                const record = data.result.records.find(r => String(r.mispar_rechev) === plate);
+                // שימוש במתווך כדי למנוע חסימת אבטחה (CORS)
+                const resourceId = '053ad243-5e8b-4474-8c27-40e4ee9067b0';
+                const apiUrl = `https://data.gov.il/api/3/action/datastore_search?resource_id=${resourceId}&q=${plate}`;
+                
+                // אנחנו מוסיפים "מתווך" (Proxy) חינמי למקרים של חסימה
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(apiUrl);
+
+                const response = await fetch(proxyUrl);
+                const proxyData = await response.json();
+                const data = JSON.parse(proxyData.contents);
+                
+                const record = data.result.records.find(r => String(r.mispar_rechev).trim() === plate.trim());
 
                 if (record) {
                     const vin = record.deg_deg;
                     document.getElementById('resMake').innerText = record.tozeret_nm;
                     document.getElementById('resModel').innerText = record.kinuy_mishari;
                     document.getElementById('resYear').innerText = record.shnat_yitzur;
-                    document.getElementById('resEngine').innerText = record.deg_manua;
+                    document.getElementById('resEngine').innerText = record.deg_manua || 'לא צוין';
                     document.getElementById('resVin').innerText = vin;
 
-                    // עדכון לינקים
                     document.getElementById('linkPartsouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${vin}`;
                     document.getElementById('link7Zap').href = `https://7zap.com/en/catalog/cars/vin/${vin}`;
 
                     results.classList.remove('hidden');
                 } else {
-                    error.innerText = "הרכב לא נמצא במאגר.";
+                    error.innerText = "מספר רכב לא נמצא במאגר.";
                     error.classList.remove('hidden');
                 }
             } catch (err) {
-                error.innerText = "שגיאה בחיבור למאגר הממשלתי.";
+                console.error(err);
+                error.innerText = "תקלה בגישה למאגר. נסה שוב בעוד רגע.";
                 error.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
