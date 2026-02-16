@@ -3,93 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>מערכת מק"טים - Google Cloud</title>
+    <title>מערכת VIN PRO - Google Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #f8fafc; }
-        .license-plate { background: #ffeb3b; border: 3px solid #000; border-radius: 12px; font-weight: 900; box-shadow: 0 4px 0 #000; }
+        body { font-family: 'Assistant', sans-serif; background: #f8fafc; overflow-x: hidden; }
+        .license-plate { 
+            background: #ffeb3b; 
+            border: 3px solid #000; 
+            border-radius: 12px; 
+            font-weight: 900; 
+            box-shadow: 0 4px 0 #000; 
+            transition: all 0.2s;
+        }
+        .license-plate:focus { transform: translateY(-2px); box-shadow: 0 6px 0 #000; outline: none; }
+        .result-card { animation: slideUp 0.4s ease-out forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[85vh] flex flex-col border border-gray-100 mt-4">
-        
-        <div class="bg-blue-600 p-8 text-white text-center rounded-b-[40px] shadow-lg">
-            <h1 class="text-3xl font-black italic">VIN FINDER</h1>
-            <p class="opacity-90 text-xs mt-1 font-bold uppercase tracking-widest">Powered by Google Cloud</p>
+<body class="antialiased text-slate-900">
+
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-4">
+        <div class="bg-gradient-to-br from-indigo-600 to-blue-800 pt-10 pb-16 px-6 rounded-b-[40px] shadow-2xl text-center">
+            <h1 class="text-white text-4xl font-extrabold tracking-tighter italic">VIN FINDER</h1>
+            <p class="text-blue-100 text-xs mt-2 font-bold opacity-80 tracking-widest uppercase">Direct Google Proxy Connection</p>
         </div>
 
-        <div class="p-6 -mt-8 flex-1">
-            <div class="bg-white rounded-3xl shadow-xl p-6 border border-gray-50">
-                <label class="block text-gray-400 text-[10px] font-bold mb-2 text-center">הכנס מספר רכב (8 ספרות)</label>
-                <input type="tel" id="plateInput" placeholder="44648402" 
-                       class="license-plate w-full py-4 text-center text-4xl tracking-[3px] outline-none mb-4">
-                <button onclick="fetchCarData()" id="btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg active:scale-95 transition-all">
-                    שלוף שלדה עכשיו
-                </button>
+        <div class="px-4 -mt-10 flex-1">
+            <div class="bg-white rounded-[2.5rem] shadow-xl p-8 border border-slate-100">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-slate-400 text-[10px] font-black mb-2 text-center uppercase tracking-widest">מספר רכב (8 ספרות)</label>
+                        <input type="tel" id="plateInput" placeholder="44648402" maxlength="8"
+                               class="license-plate w-full py-5 text-center text-4xl tracking-[4px]">
+                    </div>
+                    
+                    <button onclick="fetchCarData()" id="btn" 
+                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl font-extrabold text-xl shadow-lg shadow-indigo-200 active:scale-95 transition-all">
+                        שלוף נתונים
+                    </button>
+                </div>
             </div>
 
             <div id="loader" class="hidden flex flex-col items-center py-12">
-                <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-3"></div>
-                <p class="text-blue-600 font-bold animate-pulse">מתחבר לשרתי גוגל...</p>
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent mb-4"></div>
+                <p class="text-indigo-600 font-bold text-sm animate-pulse text-center">מבצע עקיפה דרך שרתי גוגל...<br><span class="text-[10px] opacity-60">זה לוקח שניה</span></p>
             </div>
 
-            <div id="results" class="hidden mt-8 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div class="bg-slate-900 p-6 rounded-[2rem] text-center shadow-xl border-t-4 border-blue-500">
-                    <span class="text-blue-400 text-[10px] font-black tracking-widest block mb-1 uppercase">Chassis Number (VIN)</span>
-                    <p id="resVin" class="text-white font-mono text-xl font-bold tracking-widest break-all mb-4"></p>
-                    <button onclick="copyVin()" class="w-full bg-white/10 text-white text-[10px] py-2 rounded-lg border border-white/10 hover:bg-white/20 transition-colors">
+            <div id="results" class="hidden mt-8 space-y-4 pb-10">
+                <div class="result-card bg-slate-900 p-8 rounded-[2.5rem] text-center shadow-2xl border-t-4 border-indigo-500 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg class="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                    </div>
+                    <span class="text-indigo-400 text-[10px] font-black tracking-[3px] block mb-2 uppercase">Chassis Number (VIN)</span>
+                    <p id="resVin" class="text-white font-mono text-2xl font-bold tracking-widest break-all mb-6 leading-tight"></p>
+                    <button onclick="copyVin()" class="w-full bg-white/10 text-white text-[11px] py-3 rounded-xl border border-white/10 font-bold hover:bg-white/20 active:bg-indigo-600 transition-all uppercase">
                         העתק מספר שלדה
                     </button>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-2 text-center">
-                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <span class="text-[10px] text-gray-400 block font-bold uppercase">Make</span>
-                        <p id="resMake" class="font-bold text-gray-800"></p>
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="result-card bg-white p-5 rounded-3xl border border-slate-100 shadow-sm" style="animation-delay: 0.1s">
+                        <span class="text-[10px] text-slate-400 block font-black uppercase mb-1">Make</span>
+                        <p id="resMake" class="font-bold text-slate-800 text-lg"></p>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <span class="text-[10px] text-gray-400 block font-bold uppercase">Model</span>
-                        <p id="resModel" class="font-bold text-gray-800"></p>
+                    <div class="result-card bg-white p-5 rounded-3xl border border-slate-100 shadow-sm" style="animation-delay: 0.2s">
+                        <span class="text-[10px] text-slate-400 block font-black uppercase mb-1">Model</span>
+                        <p id="resModel" class="font-bold text-slate-800 text-lg"></p>
                     </div>
                 </div>
 
-                <a id="pSouq" target="_blank" class="block bg-orange-500 text-white p-5 rounded-2xl text-center font-extrabold shadow-lg shadow-orange-100 active:scale-95 transition-transform">
+                <a id="pSouq" target="_blank" 
+                   class="result-card block bg-orange-500 hover:bg-orange-600 text-white p-6 rounded-3xl text-center font-black text-xl shadow-lg shadow-orange-100 active:scale-95 transition-all" style="animation-delay: 0.3s">
                     פתח קטלוג ב-PartSouq ➔
                 </a>
             </div>
         </div>
 
-        <div class="p-6 text-center text-gray-300 text-[10px] font-bold tracking-tighter uppercase italic">
-            Secure Connection via Google Apps Script
+        <div class="p-8 text-center">
+            <p class="text-slate-300 text-[9px] font-bold tracking-widest uppercase italic">Secure Interface &copy; 2026 Yaniv Baram</p>
         </div>
     </div>
 
     <script>
         async function fetchCarData() {
-            const plate = document.getElementById('plateInput').value.trim();
+            const plateInput = document.getElementById('plateInput');
+            const plate = plateInput.value.trim();
             const btn = document.getElementById('btn');
             const loader = document.getElementById('loader');
             const results = document.getElementById('results');
             
-            // הקישור האישי שלך מגוגל
+            // הקישור המלא והתקין ששלחת לי
             const googleUrl = "https://script.google.com/macros/s/AKfycbzEqh5VwcP8kQ4aT13jPVoB858hHd8VbXTXSqlX26oPIDH_38LFin0nvogXS03uIDGp/exec";
 
-            if (!plate) return;
+            if (!plate || plate.length < 5) {
+                alert("אנא הכנס מספר רכב תקין");
+                return;
+            }
 
+            // הכנת המסך
             btn.disabled = true;
+            btn.style.opacity = "0.5";
             results.classList.add('hidden');
             loader.classList.remove('hidden');
 
             try {
-                // הבקשה נשלחת לשרת של גוגל, שעוקף את כל החסימות
+                // שליחת הבקשה ל-Google Apps Script
                 const response = await fetch(`${googleUrl}?plate=${plate}`);
+                
+                if (!response.ok) throw new Error("Google connection failed");
+                
                 const data = await response.json();
                 
-                // חיפוש הרכב בתוצאות
+                // חיפוש הרכב במאגר שהוחזר מגוגל
                 const car = data.result.records.find(r => String(r.mispar_rechev).trim() === plate);
 
                 if (car) {
+                    // עדכון הנתונים במסך
                     document.getElementById('resMake').innerText = car.tozeret_nm;
                     document.getElementById('resModel').innerText = car.kinuy_mishari;
                     document.getElementById('resVin').innerText = car.deg_deg;
@@ -97,22 +130,34 @@
                     
                     loader.classList.add('hidden');
                     results.classList.remove('hidden');
+                    
+                    // גלילה אוטומטית לתוצאות
+                    setTimeout(() => results.scrollIntoView({ behavior: 'smooth' }), 100);
                 } else {
-                    alert("הרכב לא נמצא במאגר הממשלתי. בדוק את המספר ונסה שוב.");
+                    alert("הרכב לא נמצא במאגר הממשלתי. וודא שהמספר נכון.");
                 }
             } catch (err) {
                 console.error(err);
-                alert("שגיאת חיבור. וודא שהגדרת את ה-Deploy בגוגל לגישה ל-'Everyone'.");
+                alert("שגיאת תקשורת. וודא שהגדרת את ה-Deploy בגוגל לגישה ל-'כולם' (Anyone).");
             } finally {
                 btn.disabled = false;
+                btn.style.opacity = "1";
                 loader.classList.add('hidden');
             }
         }
 
         function copyVin() {
             const vin = document.getElementById('resVin').innerText;
-            navigator.clipboard.writeText(vin);
-            alert("מספר השלדה הועתק!");
+            navigator.clipboard.writeText(vin).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = "הועתק בהצלחה!";
+                btn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-green-600');
+                }, 2000);
+            });
         }
     </script>
 </body>
