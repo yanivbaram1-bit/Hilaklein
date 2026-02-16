@@ -3,80 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Parts Assistant</title>
+    <title>Gemini Parts Expert | מומחה החלפים שלך</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #0f172a; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .gemini-gradient { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
+        body { 
+            font-family: 'Assistant', sans-serif; 
+            background: #0b0e14; 
+            color: white; 
+            height: 100vh; 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container { 
+            flex: 1;
+            overflow-y: auto; 
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .ai-msg { 
+            background: #1e293b; 
+            border-radius: 20px 20px 0 20px; 
+            align-self: flex-start;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .user-msg { 
+            background: #3b82f6; 
+            border-radius: 20px 20px 20px 0; 
+            align-self: flex-end;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            height: 5px; width: 5px; background: white; border-radius: 50%; display: inline-block; margin: 0 2px;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
     </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center">
+<body class="flex flex-col">
 
-    <div class="w-full max-w-md text-center mb-8 mt-6">
-        <div class="inline-block p-2 px-4 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold mb-2">GEMINI AI ASSISTANT</div>
-        <h1 class="text-4xl font-black tracking-tight">איתור מק"ט חכם</h1>
+    <div class="p-6 border-b border-white/10 bg-slate-900/50 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-xl font-black text-blue-400">GEMINI <span class="text-white text-lg">AI PARTS</span></h1>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">VAG & Global Specialist</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] text-green-500 font-bold uppercase">System Active</span>
+            <div class="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
+        </div>
     </div>
 
-    <div class="w-full max-w-md glass rounded-[2.5rem] p-6 shadow-2xl">
-        <div class="space-y-4">
-            <div>
-                <label class="block text-xs font-bold text-gray-400 mb-1 mr-2">מספר שלדה (VIN)</label>
-                <input type="text" id="vinInput" placeholder="הדבק VIN כאן..." 
-                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white font-mono uppercase focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-
-            <div>
-                <label class="block text-xs font-bold text-gray-400 mb-1 mr-2">מה אתה מחפש?</label>
-                <input type="text" id="partSearch" placeholder="למשל: משאבת מים, ברקסים..." 
-                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-
-            <button onclick="analyzeRequest()" class="w-full gemini-gradient text-slate-900 font-black py-4 rounded-2xl text-lg shadow-lg active:scale-95 transition-all">
-                שאל את GEMINI ✦
-            </button>
+    <div id="chatBox" class="chat-container space-y-4 flex flex-col">
+        <div class="ai-msg p-4 max-w-[85%] shadow-lg text-sm md:text-base">
+            שלום יניב! אני מומחה החלפים שלך. 
+            <br><br>
+            תן לי <b>מספר שלדה (VIN)</b> ושם של <b>חלק</b>, ואני אשלוף לך מק"ט והנחיות טכניות.
         </div>
+    </div>
 
-        <div id="aiResponse" class="hidden mt-6 p-4 rounded-2xl bg-white/5 border-t-2 border-blue-500">
-            <p class="text-blue-400 text-xs font-bold mb-2 uppercase">Gemini Insights:</p>
-            <p id="responseText" class="text-sm leading-relaxed mb-4"></p>
-            
-            <div class="grid grid-cols-1 gap-2">
-                <a id="linkVag" target="_blank" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl text-xs flex justify-between items-center transition-colors">
-                    <span>פתח קטלוג VAG (שלדה מוזנת)</span>
-                    <span class="text-blue-400">➔</span>
-                </a>
-                <a id="linkGoogle" target="_blank" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl text-xs flex justify-between items-center transition-colors">
-                    <span>חפש מק"ט ב-Google</span>
-                    <span class="text-blue-400">➔</span>
-                </a>
+    <div class="p-4 bg-slate-900 border-t border-white/10 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+        <div class="max-w-4xl mx-auto flex flex-col gap-2">
+            <div class="flex gap-2">
+                <input type="text" id="userInput" 
+                       placeholder="הקלד VIN וחלק (למשל: VSSZZZ... משאבת מים)" 
+                       class="flex-1 bg-white/5 border border-white/20 p-4 rounded-2xl outline-none focus:border-blue-500 transition-all text-sm"
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" id="sendBtn" 
+                        class="bg-blue-600 px-6 rounded-2xl font-bold hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center">
+                    <span id="btnText">שלח</span>
+                </button>
             </div>
+            <p class="text-[9px] text-center text-gray-500 uppercase font-bold tracking-tighter">Powered by Gemini 1.5 Flash • Pro Mechanical Data</p>
         </div>
     </div>
 
     <script>
-        function analyzeRequest() {
-            const vin = document.getElementById('vinInput').value.trim();
-            const part = document.getElementById('partSearch').value.trim();
-            const responseArea = document.getElementById('aiResponse');
-            const responseText = document.getElementById('responseText');
+        // המפתח שלך כבר מוטמע כאן
+        const API_KEY = "AIzaSyCduTtvTo82XNuk3Q-PIVBpNyP2fYrLsQU"; 
 
-            if (!vin || !part) {
-                alert("חובה להזין גם VIN וגם את שם החלק");
-                return;
-            }
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatBox = document.getElementById('chatBox');
+            const btn = document.getElementById('sendBtn');
+            const text = input.value.trim();
 
-            // סימולציה של ניתוח AI
-            responseArea.classList.remove('hidden');
-            responseText.innerText = `אני מנתח את הבקשה עבור חלק: "${part}" לרכב עם שלדה ${vin}. כדי להבטיח דיוק של 100% במק"ט, הכנתי לך קישורים ישירים לקטלוגים המקוריים עם השלדה שלך מוזנת בפנים:`;
+            if (!text) return;
 
-            // בניית קישורים חכמים
-            // קישור ל-Lllparts (VAG)
-            document.getElementById('linkVag').href = `https://www.lllparts.co.uk/en/catalogs/search?q=${vin}+${part}`;
+            // הצגת הודעת המשתמש
+            chatBox.innerHTML += `<div class="user-msg p-4 max-w-[85%] self-end shadow-lg text-sm">${text}</div>`;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // יצירת הודעת המתנה של ה-AI
+            const loadingId = "load-" + Date.now();
+            chatBox.innerHTML += `
+                <div id="${loadingId}" class="ai-msg p-4 max-w-[85%] self-start opacity-70 flex items-center gap-2">
+                    <span class="text-xs">מנתח נתוני יצרן</span>
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                </div>`;
             
-            // קישור לחיפוש מק"ט בגוגל
-            document.getElementById('linkGoogle').href = `https://www.google.com/search?q=OEM+part+number+${part}+VIN+${vin}`;
+            btn.disabled = true;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ 
+                            parts: [{ 
+                                text: `You are a professional automotive parts expert for mechanics. 
+                                The user will provide a VIN and a part name. 
+                                1. Identify the car model from the VIN.
+                                2. Provide the OEM Part Number for the requested part.
+                                3. Give 2-3 professional mechanical tips for installation.
+                                4. Provide everything in Hebrew in a clear, bulleted list.
+                                User input: ${text}` 
+                            }] 
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error.message);
+
+                const aiText = data.candidates[0].content.parts[0].text;
+
+                // הסרת הודעת הטעינה והחלפתה בתשובה המלאה
+                document.getElementById(loadingId).remove();
+                chatBox.innerHTML += `
+                    <div class="ai-msg p-4 max-w-[85%] self-start shadow-lg border-r-4 border-blue-500 text-sm leading-relaxed">
+                        <div class="markdown-content">${aiText.replace(/\n/g, '<br>')}</div>
+                    </div>`;
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById(loadingId).innerHTML = `<span class="text-red-400 font-bold">שגיאה: ${e.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
         }
     </script>
 </body>
