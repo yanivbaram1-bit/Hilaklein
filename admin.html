@@ -2,104 +2,81 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>מערכת VIN PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Parts Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #f8fafc; }
-        .license-plate { background: #ffeb3b; border: 3px solid #000; border-radius: 12px; font-weight: 900; box-shadow: 0 4px 0 #000; }
+        body { font-family: 'Assistant', sans-serif; background: #0f172a; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gemini-gradient { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-md mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[85vh] flex flex-col border border-gray-100 mt-4">
-        
-        <div class="bg-indigo-600 p-8 text-white text-center rounded-b-[40px] shadow-lg">
-            <h1 class="text-3xl font-black italic text-white">VIN FINDER</h1>
-            <p class="opacity-90 text-xs mt-1 font-bold">חיבור ישיר לגוגל ענן</p>
+<body class="min-h-screen p-4 flex flex-col items-center">
+
+    <div class="w-full max-w-md text-center mb-8 mt-6">
+        <div class="inline-block p-2 px-4 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold mb-2">GEMINI AI ASSISTANT</div>
+        <h1 class="text-4xl font-black tracking-tight">איתור מק"ט חכם</h1>
+    </div>
+
+    <div class="w-full max-w-md glass rounded-[2.5rem] p-6 shadow-2xl">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 mb-1 mr-2">מספר שלדה (VIN)</label>
+                <input type="text" id="vinInput" placeholder="הדבק VIN כאן..." 
+                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white font-mono uppercase focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 mb-1 mr-2">מה אתה מחפש?</label>
+                <input type="text" id="partSearch" placeholder="למשל: משאבת מים, ברקסים..." 
+                       class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <button onclick="analyzeRequest()" class="w-full gemini-gradient text-slate-900 font-black py-4 rounded-2xl text-lg shadow-lg active:scale-95 transition-all">
+                שאל את GEMINI ✦
+            </button>
         </div>
 
-        <div class="p-6 -mt-8 flex-1">
-            <div class="bg-white rounded-3xl shadow-xl p-6 border border-gray-50">
-                <input type="tel" id="plateInput" placeholder="מספר רכב" 
-                       class="license-plate w-full py-4 text-center text-4xl tracking-widest outline-none mb-4">
-                <button onclick="fetchCarData()" id="btn" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg active:scale-95 transition-all">
-                    שלוף שלדה
-                </button>
-            </div>
-
-            <div id="loader" class="hidden flex flex-col items-center py-12">
-                <div class="animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent mb-3"></div>
-                <p class="text-indigo-600 font-bold">מתחבר לגוגל...</p>
-            </div>
-
-            <div id="results" class="hidden mt-8 space-y-4">
-                <div class="bg-slate-900 p-6 rounded-[2rem] text-center border-t-4 border-indigo-500 shadow-2xl">
-                    <span class="text-indigo-400 text-[10px] font-black tracking-widest block mb-1 uppercase">VIN NUMBER</span>
-                    <p id="resVin" class="text-white font-mono text-xl font-bold tracking-widest break-all mb-4"></p>
-                    <button onclick="copyVin()" class="w-full bg-white/10 text-white text-[10px] py-2 rounded-lg border border-white/10">העתק מספר</button>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-2 text-center font-bold">
-                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100"><span class="text-[10px] text-gray-400 block font-bold">יצרן</span><p id="resMake"></p></div>
-                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100"><span class="text-[10px] text-gray-400 block font-bold">דגם</span><p id="resModel"></p></div>
-                </div>
-
-                <a id="pSouq" target="_blank" class="block bg-orange-500 text-white p-5 rounded-2xl text-center font-extrabold shadow-lg active:scale-95 transition-transform">PartSouq חיפוש ב- ➔</a>
+        <div id="aiResponse" class="hidden mt-6 p-4 rounded-2xl bg-white/5 border-t-2 border-blue-500">
+            <p class="text-blue-400 text-xs font-bold mb-2 uppercase">Gemini Insights:</p>
+            <p id="responseText" class="text-sm leading-relaxed mb-4"></p>
+            
+            <div class="grid grid-cols-1 gap-2">
+                <a id="linkVag" target="_blank" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl text-xs flex justify-between items-center transition-colors">
+                    <span>פתח קטלוג VAG (שלדה מוזנת)</span>
+                    <span class="text-blue-400">➔</span>
+                </a>
+                <a id="linkGoogle" target="_blank" class="bg-white/10 hover:bg-white/20 p-3 rounded-xl text-xs flex justify-between items-center transition-colors">
+                    <span>חפש מק"ט ב-Google</span>
+                    <span class="text-blue-400">➔</span>
+                </a>
             </div>
         </div>
     </div>
 
     <script>
-        async function fetchCarData() {
-            const plate = document.getElementById('plateInput').value.trim();
-            const btn = document.getElementById('btn');
-            const loader = document.getElementById('loader');
-            const results = document.getElementById('results');
-            
-            // הקישור המדויק ששלחת לי עכשיו
-            const googleUrl = "https://script.google.com/macros/s/AKfycbzEqh5VwcP8kQ4aT13jPVoB858hHd8VbXTXSqlX26oPIDH_38LFin0nvogXS03uIDGp/exec";
+        function analyzeRequest() {
+            const vin = document.getElementById('vinInput').value.trim();
+            const part = document.getElementById('partSearch').value.trim();
+            const responseArea = document.getElementById('aiResponse');
+            const responseText = document.getElementById('responseText');
 
-            if (!plate) return;
-
-            btn.disabled = true;
-            results.classList.add('hidden');
-            loader.classList.remove('hidden');
-
-            try {
-                // שימוש ב-fetch עם הגדרות עקיפה
-                const response = await fetch(`${googleUrl}?plate=${plate}`);
-                const data = await response.json();
-                
-                // חיפוש בתוך המערך של הנתונים מגוגל
-                if (data && data.result && data.result.records) {
-                    const car = data.result.records.find(r => String(r.mispar_rechev).trim() === plate);
-
-                    if (car) {
-                        document.getElementById('resMake').innerText = car.tozeret_nm;
-                        document.getElementById('resModel').innerText = car.kinuy_mishari;
-                        document.getElementById('resVin').innerText = car.deg_deg;
-                        document.getElementById('pSouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${car.deg_deg}`;
-                        
-                        loader.classList.add('hidden');
-                        results.classList.remove('hidden');
-                    } else {
-                        alert("הרכב לא נמצא במאגר הממשלתי.");
-                    }
-                }
-            } catch (err) {
-                console.error(err);
-                alert("שגיאת תקשורת. וודא שביצעת 'פריסה' (Deploy) ל-'כולם' (Anyone) בגוגל.");
-            } finally {
-                btn.disabled = false;
-                loader.classList.add('hidden');
+            if (!vin || !part) {
+                alert("חובה להזין גם VIN וגם את שם החלק");
+                return;
             }
-        }
 
-        function copyVin() {
-            const vin = document.getElementById('resVin').innerText;
-            navigator.clipboard.writeText(vin);
-            alert("הועתק!");
+            // סימולציה של ניתוח AI
+            responseArea.classList.remove('hidden');
+            responseText.innerText = `אני מנתח את הבקשה עבור חלק: "${part}" לרכב עם שלדה ${vin}. כדי להבטיח דיוק של 100% במק"ט, הכנתי לך קישורים ישירים לקטלוגים המקוריים עם השלדה שלך מוזנת בפנים:`;
+
+            // בניית קישורים חכמים
+            // קישור ל-Lllparts (VAG)
+            document.getElementById('linkVag').href = `https://www.lllparts.co.uk/en/catalogs/search?q=${vin}+${part}`;
+            
+            // קישור לחיפוש מק"ט בגוגל
+            document.getElementById('linkGoogle').href = `https://www.google.com/search?q=OEM+part+number+${part}+VIN+${vin}`;
         }
     </script>
 </body>
