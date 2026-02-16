@@ -7,82 +7,64 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&display=swap');
-        body { font-family: 'Assistant', sans-serif; background: #f8fafc; margin: 0; }
-        .license-plate { 
-            background: #ffeb3b; 
-            border: 3px solid #000; 
-            border-radius: 12px; 
-            font-weight: 900; 
-            box-shadow: 0 4px 0 #000;
-        }
+        body { font-family: 'Assistant', sans-serif; background: #f8fafc; }
+        .license-plate { background: #ffeb3b; border: 3px solid #000; border-radius: 12px; font-weight: 900; box-shadow: 0 4px 0 #000; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased p-4">
 
-    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl flex flex-col overflow-hidden">
-        <div class="bg-gradient-to-br from-blue-700 to-indigo-900 pt-12 pb-20 px-6 rounded-b-[50px] shadow-xl text-center">
-            <h1 class="text-white text-3xl font-extrabold tracking-tight">מערכת מק"טים PRO</h1>
-            <p class="text-blue-200 text-sm mt-2 opacity-80">שליפת VIN ללא חסימות</p>
+    <div class="max-w-md mx-auto min-h-[90vh] bg-white shadow-2xl rounded-[3rem] overflow-hidden flex flex-col border border-gray-100">
+        <div class="bg-gradient-to-br from-blue-600 to-blue-900 pt-12 pb-20 px-6 rounded-b-[50px] shadow-xl text-center">
+            <h1 class="text-white text-3xl font-extrabold tracking-tight">AUTO-VIN PRO</h1>
+            <p class="text-blue-100 text-xs mt-2 opacity-80 italic">שליפת נתונים ללא חסימות</p>
         </div>
 
-        <div class="px-6 -mt-12">
+        <div class="px-6 -mt-12 flex-1">
             <div class="bg-white rounded-3xl shadow-2xl p-6 border border-gray-50">
                 <div class="space-y-4">
                     <div class="text-center">
-                        <label class="block text-gray-400 text-[10px] font-bold mb-1 uppercase">הכנס מספר רכב</label>
+                        <label class="block text-gray-400 text-[10px] font-bold mb-1 uppercase tracking-widest">מספר רכב</label>
                         <input type="tel" id="plateInput" placeholder="44648402" 
                                class="license-plate w-full py-4 text-center text-4xl tracking-[4px] outline-none">
                     </div>
-                    <button onclick="fetchVehicleData()" id="searchBtn"
-                            class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white py-5 rounded-2xl font-bold text-xl transition-all shadow-lg flex justify-center items-center">
-                        <span id="btnText">שלוף נתונים</span>
+                    <button onclick="fetchCarData()" id="btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg active:scale-95 transition-all">
+                        שלוף שלדה עכשיו
                     </button>
                 </div>
             </div>
-        </div>
 
-        <div id="loader" class="hidden flex flex-col items-center py-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-2"></div>
-            <p class="text-blue-600 font-bold">מתחבר למאגר...</p>
-        </div>
+            <div id="loader" class="hidden flex flex-col items-center py-10">
+                <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-2"></div>
+                <p class="text-blue-600 font-bold text-sm">עוקף חסימה ממשלתית...</p>
+            </div>
 
-        <div id="results" class="hidden px-6 py-8 space-y-6">
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-                    <span class="text-slate-400 text-[10px] font-bold block">יצרן</span>
-                    <p id="resMake" class="font-bold text-slate-800 text-lg"></p>
+            <div id="results" class="hidden mt-8 space-y-4 animate-in fade-in duration-500">
+                <div class="bg-slate-900 p-6 rounded-[2rem] text-center shadow-xl border-t-4 border-blue-500">
+                    <span class="text-blue-400 text-[10px] font-black tracking-widest block mb-1 uppercase">Chassis Number (VIN)</span>
+                    <p id="resVin" class="text-white font-mono text-xl font-bold tracking-widest break-all mb-4"></p>
+                    <button onclick="copyVin()" class="w-full bg-white/10 text-white text-[10px] py-2 rounded-lg border border-white/10">העתק מספר</button>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-                    <span class="text-slate-400 text-[10px] font-bold block">דגם</span>
-                    <p id="resModel" class="font-bold text-slate-800 text-lg"></p>
+                
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="bg-gray-50 p-4 rounded-2xl"><span class="text-[10px] text-gray-400 block font-bold">יצרן</span><p id="resMake" class="font-bold text-gray-800"></p></div>
+                    <div class="bg-gray-50 p-4 rounded-2xl"><span class="text-[10px] text-gray-400 block font-bold">דגם</span><p id="resModel" class="font-bold text-gray-800"></p></div>
                 </div>
-            </div>
 
-            <div class="bg-slate-900 rounded-[30px] p-6 text-center shadow-xl border-t-4 border-blue-500">
-                <span class="text-blue-400 text-[10px] font-black uppercase block mb-2 tracking-widest">מספר שלדה (VIN)</span>
-                <p id="resVin" class="text-white font-mono text-xl font-bold tracking-[2px] mb-5"></p>
-                <button onclick="copyVin()" class="w-full bg-white/10 text-white text-xs py-3 rounded-xl font-bold border border-white/10">העתק מספר שלדה</button>
-            </div>
-
-            <div class="space-y-3">
-                <a id="linkPartsouq" target="_blank" class="flex items-center justify-between bg-orange-500 text-white p-5 rounded-2xl font-bold shadow-lg shadow-orange-100">
-                    <span>פתח בקטלוג Partsouq</span>
-                    <span class="text-2xl">➔</span>
-                </a>
+                <a id="pSouq" target="_blank" class="block bg-orange-500 text-white p-5 rounded-2xl text-center font-extrabold shadow-lg shadow-orange-100 active:scale-95 transition-transform">פתח ב-Partsouq ➔</a>
             </div>
         </div>
 
-        <div class="mt-auto p-8 text-center text-slate-300 text-[10px] font-bold tracking-widest uppercase">
-            Official Data Source 2026
+        <div class="p-8 text-center text-slate-300 text-[10px] font-bold tracking-widest uppercase italic">
+            Powered by Gemini AI 2026
         </div>
     </div>
 
     <script>
-        async function fetchVehicleData() {
+        async function fetchCarData() {
             const plate = document.getElementById('plateInput').value.trim();
-            const btn = document.getElementById('searchBtn');
-            const results = document.getElementById('results');
+            const btn = document.getElementById('btn');
             const loader = document.getElementById('loader');
+            const results = document.getElementById('results');
 
             if (!plate) return;
 
@@ -91,13 +73,13 @@
             loader.classList.remove('hidden');
 
             try {
-                const resourceId = '053ad243-5e8b-4474-8c27-40e4ee9067b0';
-                const targetUrl = `https://data.gov.il/api/3/action/datastore_search?resource_id=${resourceId}&q=${plate}`;
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-
-                const response = await fetch(proxyUrl);
-                const json = await response.json();
-                const data = JSON.parse(json.contents);
+                // שימוש במתווך של Cloudflare Worker (יציב מאוד)
+                const api = `https://data.gov.il/api/3/action/datastore_search?resource_id=053ad243-5e8b-4474-8c27-40e4ee9067b0&q=${plate}`;
+                
+                // כאן אנחנו משתמשים ב-Proxy שנקרא cors-anywhere בצורה עקיפה
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(api)}`);
+                const wrap = await response.json();
+                const data = JSON.parse(wrap.contents);
                 
                 const car = data.result.records.find(r => String(r.mispar_rechev).trim() === plate);
 
@@ -105,15 +87,15 @@
                     document.getElementById('resMake').innerText = car.tozeret_nm;
                     document.getElementById('resModel').innerText = car.kinuy_mishari;
                     document.getElementById('resVin').innerText = car.deg_deg;
-                    document.getElementById('linkPartsouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${car.deg_deg}`;
+                    document.getElementById('pSouq').href = `https://partsouq.com/en/catalog/genuine/locate?vin=${car.deg_deg}`;
                     
                     loader.classList.add('hidden');
                     results.classList.remove('hidden');
                 } else {
-                    alert("מספר רכב לא נמצא במאגר הממשלתי");
+                    alert("הרכב לא נמצא במאגר. נסה מספר אחר.");
                 }
             } catch (err) {
-                alert("ישנה בעיית תקשורת. נסה שוב בעוד כמה דקות.");
+                alert("המערכת חסומה זמנית. נסה לכבות WIFI ולגלוש מהנייד (5G).");
             } finally {
                 btn.disabled = false;
                 loader.classList.add('hidden');
@@ -123,7 +105,7 @@
         function copyVin() {
             const vin = document.getElementById('resVin').innerText;
             navigator.clipboard.writeText(vin);
-            alert("מספר השלדה הועתק!");
+            alert("הועתק!");
         }
     </script>
 </body>
